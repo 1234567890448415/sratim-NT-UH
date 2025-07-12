@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/sratim-NT-UH/static/css/main.06532247.css",
+    "main.js": "/sratim-NT-UH/static/js/main.ea8b04d6.js",
+    "static/js/453.459e0f7a.chunk.js": "/sratim-NT-UH/static/js/453.459e0f7a.chunk.js",
+    "index.html": "/sratim-NT-UH/index.html",
+    "main.06532247.css.map": "/sratim-NT-UH/static/css/main.06532247.css.map",
+    "main.ea8b04d6.js.map": "/sratim-NT-UH/static/js/main.ea8b04d6.js.map",
+    "453.459e0f7a.chunk.js.map": "/sratim-NT-UH/static/js/453.459e0f7a.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.06532247.css",
+    "static/js/main.ea8b04d6.js"
+  ]
+}

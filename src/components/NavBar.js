@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
+import Greeting from "./Greeting";
 
 function getGreeting() {
   const hour = new Date().getHours();
@@ -53,11 +54,11 @@ export default function NavBar({ user, onLogout }) {
         >
           מנהל
         </Link>
-        {/* ברכת שם משתמש */}
+        {/* ברכת שם משתמש מעוצבת */}
         {user && (
-          <span className="text-lg font-bold text-white bg-gray-800 rounded-full px-4 py-2 mr-4">
-            {user.displayName}, {getGreeting()}!
-          </span>
+          <div className="ml-4">
+            <Greeting displayName={user.displayName} />
+          </div>
         )}
         {/* כפתור התנתקות */}
         {user && (

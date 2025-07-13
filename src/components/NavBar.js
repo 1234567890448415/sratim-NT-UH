@@ -1,38 +1,70 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 
-export default function NavBar() {
+function getGreeting() {
+  const hour = new Date().getHours();
+  if (hour < 12) return "בוקר טוב";
+  if (hour < 17) return "צהריים טובים";
+  return "ערב טוב";
+}
+
+export default function NavBar({ user, onLogout }) {
   const location = useLocation();
+  
+  const isActive = (path) => location.pathname === path;
+  
   return (
-    <nav className="header-bar flex items-center justify-between">
+    <nav className="header-bar">
       <div className="flex items-center gap-6">
-        <Link to="/" className="text-2xl font-bold flex items-center gap-2">
-          <span className="text-red-400">🎬</span> סרטים NT&UH
+        <Link to="/" className="text-2xl font-bold flex items-center gap-2 hover:text-red-400 transition-colors">
+          <span className="text-red-400 text-3xl">🎬</span>
+          <span>סרטים NT&UH</span>
         </Link>
+      </div>
+      
+      <div className="flex items-center gap-6">
         <Link
           to="/movies"
-          className={`hover:text-red-400 transition ${
-            location.pathname === "/movies" ? "text-red-400" : ""
+          className={`px-4 py-2 rounded-full transition-all duration-300 font-medium ${
+            isActive("/movies") 
+              ? "bg-red-500 text-white shadow-lg" 
+              : "text-gray-300 hover:text-white hover:bg-gray-700"
           }`}
         >
           כל הסרטים
         </Link>
         <Link
           to="/suggest"
-          className={`hover:text-red-400 transition ${
-            location.pathname === "/suggest" ? "text-red-400" : ""
+          className={`px-4 py-2 rounded-full transition-all duration-300 font-medium ${
+            isActive("/suggest") 
+              ? "bg-red-500 text-white shadow-lg" 
+              : "text-gray-300 hover:text-white hover:bg-gray-700"
           }`}
         >
           הצע סרט
         </Link>
         <Link
           to="/admin"
-          className={`hover:text-red-400 transition ${
-            location.pathname === "/admin" ? "text-red-400" : ""
+          className={`px-4 py-2 rounded-full transition-all duration-300 font-medium ${
+            isActive("/admin") 
+              ? "bg-red-500 text-white shadow-lg" 
+              : "text-gray-300 hover:text-white hover:bg-gray-700"
           }`}
         >
           מנהל
         </Link>
+        {/* ברכת שם משתמש */}
+        {user && (
+          <span className="text-lg font-bold text-white bg-gray-800 rounded-full px-4 py-2 mr-4">
+            {user.displayName}, {getGreeting()}!
+          </span>
+        )}
+        {/* כפתור התנתקות */}
+        {user && (
+          <button className="button-main px-4 py-2 text-sm" onClick={onLogout}>
+            התנתק
+          </button>
+        )}
       </div>
     </nav>
   );

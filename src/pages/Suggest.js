@@ -1,69 +1,127 @@
 import React, { useState } from "react";
 import UploadToCloudinary from "../components/UploadToCloudinary";
+import { addMovie } from "../utils/movieStorage";
 
 export default function Suggest() {
   const [movieName, setMovieName] = useState("");
   const [description, setDescription] = useState("");
-  const [poster, setPoster] = useState(null);
   const [posterUrl, setPosterUrl] = useState("");
+  const [videoUrl, setVideoUrl] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // העלאת תמונת פוסטר ל-Cloudinary (כמו העלאת סרט, רק ל-image/upload)
-  const CLOUD_NAME = "הכנס_כאן_את_cloud_name_שלך";
-  const UPLOAD_PRESET = "הכנס_כאן_את_upload_preset_שלך";
-
-  const handlePosterChange = (e) => {
-    setPoster(e.target.files[0]);
+  const handlePosterUpload = (url) => {
+    setPosterUrl(url);
   };
 
-  const handlePosterUpload = async (e) => {
+  const handleVideoUpload = (url) => {
+    setVideoUrl(url);
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!poster) return;
-    const formData = new FormData();
-    formData.append("file", poster);
-    formData.append("upload_preset", UPLOAD_PRESET);
-    const res = await fetch(
-      `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
-    const data = await res.json();
-    setPosterUrl(data.secure_url);
+    
+    if (!movieName || !description || !posterUrl || !videoUrl) {
+      alert("אנא מלא את כל השדות");
+      return;
+    }
+
+    setIsSubmitting(true);
+    
+    try {
+      const newMovie = addMovie({
+        name: movieName,
+        description: description,
+        posterUrl: posterUrl,
+        videoUrl: videoUrl
+      });
+
+      // איפוס הטופס
+      setMovieName("");
+      setDescription("");
+      setPosterUrl("");
+      setVideoUrl("");
+      
+      alert("הסרט נוסף בהצלחה!");
+    } catch (error) {
+      alert("שגיאה בהוספת הסרט");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="container mx-auto py-10">
-      <h1 className="text-3xl font-bold mb-8 text-white">הצע סרט חדש</h1>
-      <form className="bg-[#23283b] rounded-2xl p-8 max-w-xl mx-auto shadow-lg mb-8">
-        <label className="block mb-2 text-white font-bold">שם הסרט</label>
-        <input
-          className="search-bar mb-4"
-          placeholder="שם הסרט"
-          value={movieName}
-          onChange={(e) => setMovieName(e.target.value)}
-        />
-        <label className="block mb-2 text-white font-bold">תיאור</label>
-        <textarea
-          className="search-bar mb-4"
-          placeholder="תיאור הסרט"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <label className="block mb-2 text-white font-bold">העלה תמונת פוסטר</label>
-        <input type="file" accept="image/*" className="mb-2" onChange={handlePosterChange} />
-        <button className="button-main w-full mb-4" onClick={handlePosterUpload} type="button">
-          העלה פוסטר
-        </button>
-        {posterUrl && (
-          <img src={posterUrl} alt="פוסטר" className="w-40 h-40 object-cover rounded-xl mx-auto mb-4" />
-        )}
+    <div className="container mx-auto py-10 px-4">
+      <h1 className="text-4xl font-bold mb-8 text-white text-center">
+        הצע סרט חדש
+      </h1>
+      
+      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto">
+        <div className="bg-[#23283b] rounded-2xl p-8 shadow-lg mb-8">
+          <h2 className="text-2xl font-bold mb-6 text-white text-center">
+            פרטי הסרט
+          </h2>
+          
+          <div className="mb-6">
+            <label className="block mb-2 text-white font-bold">שם הסרט</label>
+            <input
+              className="search-bar"
+              placeholder="שם הסרט"
+              value={movieName}
+              onChange={(e) => setMovieName(e.target.value)}
+              required
+            />
+          </div>
+          
+          <div className="mb-6">
+            <label className="block mb-2 text-white font-bold">תיאור</label>
+            <textarea
+              className="search-bar min-h-[100px] resize-none"
+              placeholder="תיאור הסרט"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+            />
+          </div>
+        </div>
+
+        {/* העלאת פוסטר */}
+        <div className="bg-[#23283b] rounded-2xl p-8 shadow-lg mb-8">
+          <h2 className="text-xl font-bold mb-4 text-white">העלה תמונת פוסטר</h2>
+          <UploadToCloudinary 
+            type="image" 
+            onUploadComplete={handlePosterUpload}
+          />
+          {posterUrl && (
+            <div className="mt-4 text-center">
+              <img 
+                src={posterUrl} 
+                alt="פוסטר" 
+                className="w-40 h-40 object-cover rounded-xl mx-auto"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* העלאת סרט */}
+        <div className="bg-[#23283b] rounded-2xl p-8 shadow-lg mb-8">
+          <h2 className="text-xl font-bold mb-4 text-white">העלה קובץ סרט</h2>
+          <UploadToCloudinary 
+            type="video" 
+            onUploadComplete={handleVideoUpload}
+          />
+        </div>
+
+        {/* כפתור שליחה */}
+        <div className="text-center">
+          <button 
+            type="submit"
+            disabled={isSubmitting || !movieName || !description || !posterUrl || !videoUrl}
+            className="button-main text-lg px-8 py-4 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? "מוסיף סרט..." : "הוסף סרט"}
+          </button>
+        </div>
       </form>
-      {/* העלאת סרט ל-Cloudinary */}
-      <div className="bg-[#23283b] rounded-2xl p-8 max-w-xl mx-auto shadow-lg">
-        <h2 className="text-xl font-bold mb-4 text-white">העלה קובץ סרט</h2>
-        <UploadToCloudinary />
-      </div>
     </div>
   );
 }
